@@ -4,17 +4,18 @@ let pre = document.querySelector("pre");
 function rmBlank(str) {
     // for example str: verse 1
     try {
-        let noBlank = "";
-        str.split(" ").forEach(x => noBlank += x);
-        return noBlank;
+        let path = "";
+        str.split(" ").forEach(x => path += x);
+        return path;
     } catch (error) {
         console.log(`There is an error: ${error.message}`);
     }
 }
 
 
-sel.addEventListener("change", (event) => {
-    console.log(event.target.value);
-})
-
-console.log(rmBlank(10));
+sel.addEventListener("change", async (event) => {
+    let path= "./verse/" + rmBlank(event.target.value) + ".txt";
+    let res = await fetch(path);
+    let content = await res.text();
+    pre.textContent = content;
+});
