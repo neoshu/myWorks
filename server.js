@@ -20,8 +20,16 @@ app.post('/tmp', (req, res) => {
 
     const info = db.prepare('INSERT INTO users (name, email) VALUES (?, ?)').run(user, mail);
     //   res.json({ id: info.lastInsertRowid, name });
+    let check = db.prepare(`
+        SELECT * FROM users `).all();
     console.log(user, mail);
+    console.log(check);
     res.json({ ok: true });
 });
+
+app.get('/tmp', (req, res) => {
+    let rows = db.prepare(`SELECT * FROM users`).all();
+    res.json(rows);
+})
 
 app.listen(3000, () => console.log('http://localhost:3000'));
