@@ -9,11 +9,17 @@ form.addEventListener("submit", async (event) => {
     const user = inputUser.value.trim();
     const mail = inputEmail.value.trim();
 
-    await fetch("/tmp", {
+    const res = await fetch("/tmp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user, mail })
     });
+
+    if (!res.ok) {
+        const data = await res.json();
+        alert(data.error);
+        return;
+    }
 
     form.reset();
 });
