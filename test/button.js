@@ -1,31 +1,28 @@
-// const show = document.querySelector("#show");
-// const button = document.querySelector("button");
 /*
-function alarm(person, delay) {
-    if (delay < 0) {
-        throw new Error("Positive delay only");
-    } else {
-        button.addEventListener("click", () => {
-            show.textContent = "";
-            let content = `Wake up ${person}`;
-            setTimeout(() => {
-                show.textContent = content;
-            }, delay);
-        });
-    }
-}
+async function alarm(person, ms) {
+    if (ms < 0) {return Promise.reject(`ms should be positive`)}
+    return Promise.resolve(setTimeout(()=>console.log(`Wake up ${person}`), 2000));
+}   
 */
 
-function delay(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
+async function another_alarm(person, ms) {
+    if (ms < 0) { return Promise.reject(`ms should be positive`) }
+    return new Promise((resolve) => resolve(setTimeout(() => console.log(`${person}`), ms)));
 }
 
-function alarm(person, ms) {
-    if (ms < 0) {return Promise.reject(`negative time`)}
-    return delay(ms).then(()=>`${person} wake up`);
+another_alarm("FIFA", 3000)
+    .then((data)=>data)
+    .catch(error => console.log(error));
+
+async function alarm(person, ms) {
+    if (ms < 0) { return Promise.reject(`ms should be positive`) }
+
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve(`Wake up, ${person}!`);
+        }, ms);
+    });
 }
 
-alarm(`Jack`, 2000)
-    .then(data => console.log(data))
-    .catch((error) => console.log(error));
-
+alarm("FIFA", 2000)
+    .then(msg => console.log(msg)); 
