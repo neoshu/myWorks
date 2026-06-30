@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Temperature Report Exporter</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="app-header">
+        <div>
+          <p class="eyebrow">HIOKI LR8450 CSV</p>
+          <h1>Temperature Report Exporter</h1>
+        </div>
+        <div class="header-actions">
+          <label class="file-button">
+            <input id="csvInput" type="file" accept=".csv,.CSV,text/csv">
+            Import CSV
+          </label>
+          <button id="exportButton" type="button" disabled>Export PDF</button>
+        </div>
+      </header>
+
+      <section id="statusPanel" class="status-panel">
+        <strong>Ready.</strong>
+        <span>Select a HIOKI MEMORY HiLOGGER LR8450 CSV file to begin.</span>
+      </section>
+
+      <section class="metrics-grid" aria-label="Test summary">
+        <div class="metric">
+          <span>Start</span>
+          <strong id="startTime">-</strong>
+        </div>
+        <div class="metric">
+          <span>End</span>
+          <strong id="endTime">-</strong>
+        </div>
+        <div class="metric">
+          <span>Duration</span>
+          <strong id="duration">-</strong>
+        </div>
+        <div class="metric">
+          <span>Channels</span>
+          <strong id="channelCount">-</strong>
+        </div>
+      </section>
+
+      <section class="workspace-grid">
+        <section class="panel channel-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Channel Names</p>
+              <h2>Temperature test locations</h2>
+            </div>
+            <button id="clearNamesButton" class="secondary-button" type="button" disabled>Clear Names</button>
+          </div>
+          <div id="channelInputs" class="channel-list empty-state">
+            Import a CSV file to map channel headers to test locations.
+          </div>
+        </section>
+
+        <section class="panel preview-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Preview</p>
+              <h2>Summary table</h2>
+            </div>
+            <span id="recordCount" class="record-count">0 records</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Header</th>
+                  <th>Start</th>
+                  <th>End</th>
+                  <th>Max</th>
+                </tr>
+              </thead>
+              <tbody id="summaryBody">
+                <tr>
+                  <td colspan="4" class="table-empty">No CSV imported.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+
+      <section class="panel chart-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Curve</p>
+            <h2>Temperature over time</h2>
+          </div>
+          <span class="record-count">x-axis seconds, y-axis Celsius</span>
+        </div>
+        <div class="chart-frame">
+          <canvas id="chartCanvas" width="1280" height="560" aria-label="Temperature curve chart"></canvas>
+        </div>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
