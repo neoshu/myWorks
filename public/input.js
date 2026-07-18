@@ -1,41 +1,42 @@
-const inputUser = document.querySelector("#user");
-const inputEmail = document.querySelector("#email");
+const inputAppl = document.querySelector("#appl");
+const inputFile = document.querySelector("#file");
 const form = document.querySelector("form");
-const showAll = document.querySelector("#show");
 
 form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
-    const user = inputUser.value.trim();
-    const mail = inputEmail.value.trim();
+    const applNum = inputAppl.value.trim();
 
-    const res = await fetch("/tmp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user, mail })
-    });
-
-    if (!res.ok) {
-        const data = await res.json();
-        alert(data.error);
+    // RegExp to check the pattern of a CCC application.
+    const pattern = /^[AV]\d{4}CCC\d{4}-\d{7}$/;
+    if (!pattern.test(applNum)) {
+        alert("CCC application number is invalid.");
         return;
     }
 
-    form.reset();
+    const file = inputFile.files[0];
+    if (!file) {
+        alert("Please choose an Excel file.");
+        return;
+    }
+
+    const uploadData = new FormData();
+    uploadData.append("file", file);
+    uploadData.append("applNum", applNum);
+
+    try {
+        const res = await fetch("/import", {
+            method: "POST",
+            body: uploadData
+        });
+
+        if (!res.ok) {
+            const data = await res.json().catch(() => ({}));
+            throw new Error(data.error || `Upload failed (${res.status}).`);
+        }
+
+        form.reset();
+    } catch (error) {
+        alert(error.message || "Unable to upload the Excel file.");
+    }
 });
-
-showAll.addEventListener("click", async (event) => {
-    event.preventDefault();
-    let res = await fetch("/tmp");
-    let users = await res.json();   // array
-    let pre = document.querySelector("pre");
-    pre.textContent = ""; // initiate
-    users.forEach(row => {
-        let para = document.createElement("p");
-        // para.textContent = JSON.stringify(row);
-        para.textContent = `${row.id} ${row.name} ${row.email}`;
-        pre.appendChild(para);
-    });
-    
-
-})
