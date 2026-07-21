@@ -1,37 +1,42 @@
 const express = require("express");
+const XLSX = require('xlsx');
 const Database = require("better-sqlite3");
+const multer = require("multer");
 
 const app = express();
-const db = new Database("user.db");
+const db = new Database("motor.db");
+const upload = multer({ storage: multer.memoryStorage() });
 
-// create table
-db.prepare(`
-    CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        email TEXT NOT NULL)`).run();
+// helper function
+// 2012-4-19 -> 2012-04-19
+// 2026-11-7 -> 2026-11-07
+// 2025-06-26 -> unchanged
+function zeroPadding(arg) {
+    // arg should be string
+    if (typeof arg !== "string") {return false;}
+    // use regex to match
+    const pattern = /^20\d{2}-\d{1,2}-\d{1,2}$/gm; // rough check
+    if (!pattern.test(arg)) {return false;}
+    let tmp = arg.split("-");
+    tmp.forEach((element, index) => {
+        if (element.length === 1) {
+            tmp[index] = "0" + element;
+        }
+    })
+    return tmp.join("-");
 
-app.use(express.json());
-app.use(express.static("public"));
+}
 
-app.post('/tmp', (req, res) => {
-    const { user, mail } = req.body;
-    if (!user || !mail) return res.status(400).json({ error: 'name or mail required' });
+app.post("/import", upload.single("file"), (req, res) => {
+    // req.file      → the uploaded Excel file
+    // req.body      → { applNum: "A1234CCC5678-1234567" }
+    // 1. req.body, insert into table correlation
+    // 2. read rows from req.file, insert into table material
 
-    // check email
-    const existed = db.prepare(`SELECT email FROM users`).all();
-    if (existed.some(item => item.email === mail)) {
-        return res.status(409).json({ error: 'The email has already been occupied' });
-    }
-
-    const info = db.prepare('INSERT INTO users (name, email) VALUES (?, ?)').run(user, mail);
-    console.log(user, mail);
-    res.json({ ok: true });
+    db.prepare(`INSERT INTO correlation (appl) VALUES (?)`).run(`${req.body.applNum}`);
 });
 
-app.get('/tmp', (req, res) => {
-    let rows = db.prepare(`SELECT * FROM users`).all();
-    res.json(rows);
-});
+
+
 
 app.listen(3000, () => console.log('http://localhost:3000'));
