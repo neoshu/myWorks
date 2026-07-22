@@ -4,6 +4,10 @@ const Database = require("better-sqlite3");
 const multer = require("multer");
 
 const app = express();
+const path = require("path");
+
+app.use(express.static(path.join(__dirname, "public")));
+
 const db = new Database("motor.db");
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -32,8 +36,19 @@ app.post("/import", upload.single("file"), (req, res) => {
     // req.body      → { applNum: "A1234CCC5678-1234567" }
     // 1. req.body, insert into table correlation
     // 2. read rows from req.file, insert into table material
-
     db.prepare(`INSERT INTO correlation (appl) VALUES (?)`).run(`${req.body.applNum}`);
+
+    const workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(sheet);
+
+    const header = Object.keys(rows[0]); // column header
+    for (let row of rows) {
+        db.prepare(`INSERT INTO material (${header.join(", ")}) 
+            VALUES (${header.map(c => "?").join(", ")})`).run(Object.values(row));
+    }
+
+    res.json({ok: true});
 });
 
 
