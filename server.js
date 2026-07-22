@@ -36,17 +36,47 @@ app.post("/import", upload.single("file"), (req, res) => {
     // req.body      → { applNum: "A1234CCC5678-1234567" }
     // 1. req.body, insert into table correlation
     // 2. read rows from req.file, insert into table material
+    if (!req.file) {
+        return res.status(400).json({
+            ok: false,
+            error: "Please upload an Excel file."
+        });
+    }
+
     db.prepare(`INSERT INTO correlation (appl) VALUES (?)`).run(`${req.body.applNum}`);
 
     const workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const rows = XLSX.utils.sheet_to_json(sheet);
+    const rows = XLSX.utils.sheet_to_json(sheet, { defval: null }); // array
+
+    if (rows.length === 0) {
+        return res.status(400).json({
+            ok: false,
+            error: "The first worksheet has no material rows."
+        });
+    }
 
     const header = Object.keys(rows[0]); // column header
-    for (let row of rows) {
-        db.prepare(`INSERT INTO material (${header.join(", ")}) 
-            VALUES (${header.map(c => "?").join(", ")})`).run(Object.values(row));
-    }
+    // for (let row of rows) {
+    //     db.prepare(`INSERT INTO material (${header.join(", ")}) 
+    //         VALUES (${header.map(c => "?").join(", ")})`).run(Object.values(row));
+    // }
+
+    const insertRow = db.prepare(
+        `INSERT INTO material (${header.join(", ")}) 
+            VALUES (${header.map(c => "?").join(", ")})`
+    );
+
+    const inertMany = db.transaction((items) => {
+        for (let item of items) {
+            insertRow.run(Object.values(item));
+        }
+    });
+
+    inertMany(rows);
+
+
+
 
     res.json({ok: true});
 });
