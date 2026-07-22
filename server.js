@@ -19,7 +19,7 @@ function zeroPadding(arg) {
     // arg should be string
     if (typeof arg !== "string") {return false;}
     // use regex to match
-    const pattern = /^20\d{2}-\d{1,2}-\d{1,2}$/gm; // rough check
+    const pattern = /^\d{4}-(?:0?[1-9]|1[0-2])-(?:0?[1-9]|[12][0-9]|3[01])$/gm; // rough check
     if (!pattern.test(arg)) {return false;}
     let tmp = arg.split("-");
     tmp.forEach((element, index) => {
@@ -69,7 +69,12 @@ app.post("/import", upload.single("file"), (req, res) => {
 
     const inertMany = db.transaction((items) => {
         for (let item of items) {
-            insertRow.run(Object.values(item));
+            // the last element(issue) of item should be something like 2026-02-07
+            // instead of 2026-2-7
+            let theArray = Object.values(item);
+            let issueDate = zeroPadding(theArray.pop());
+            theArray.push(issueDate);
+            insertRow.run(theArray);
         }
     });
 
