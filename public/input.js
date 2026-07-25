@@ -1,8 +1,11 @@
 const inputAppl = document.querySelector("#appl");
 const inputFile = document.querySelector("#file");
-const form = document.querySelector("form");
+const inputForm = document.querySelector("#inputForm");
+const searchForm = document.querySelector("#searchForm");
+const applNumSearch = document.querySelector("#applSearch");
 
-form.addEventListener("submit", async (event) => {
+// file and text input(POST) eventlistener
+inputForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     const applNum = inputAppl.value.trim();
@@ -35,8 +38,42 @@ form.addEventListener("submit", async (event) => {
             throw new Error(data.error || `Upload failed (${res.status}).`);
         }
 
-        form.reset();
+        inputForm.reset();
     } catch (error) {
         alert(error.message || "Unable to upload the Excel file.");
     }
 });
+
+// application number search(GET) eventlistener
+searchForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const search_num = applNumSearch.value.trim();
+    if (!search_num) {
+        alert(`Blank application number`);
+        return;
+    }
+
+    const searchData = new FormData();
+    searchData.append("applSearch", search_num);
+
+    try {
+        const res = await fetch("/search", {
+            method: "POST",
+            body: searchData
+        });
+
+        if (!res.ok) {
+            const data = await res.json().catch(() => ({}));
+            throw new Error(data.error || `Search failed (${res.status}).`);
+        }
+
+        const applResult = await res.json(); // the result of application search
+        
+
+        searchForm.reset();
+    } catch (error) {
+        alert(error.message || "Unable to search the application.");
+    }
+
+})

@@ -8,19 +8,31 @@
 </head>
 <body>
     <h2>This is a demo for collecting excel data</h2>
-    <form>
-        <div>
-            <label for="file">Choose your excel file</label>
-            <input type="file" id="file" name="file" accept=".xlsx, .xls">
-        </div>
+    <section>
+        <h3>Input section</h3>
+        <form id="inputForm">
+            <div>
+                <label for="file">Choose your excel file</label>
+                <input type="file" id="file" name="file" accept=".xlsx, .xls">
+            </div>
+    
+            <div>
+                <label for="appl">Application:</label>
+                <input type="text" id="appl" name="appl" required>
+            </div>
+    
+            <button type="submit">Submit</button>
+        </form>
+    </section>
 
-        <div>
-            <label for="appl">Application:</label>
-            <input type="text" id="appl" name="appl" required>
-        </div>
-
-        <button type="submit">Submit</button>
-    </form>
+    <section>
+        <h3>Search section</h3>
+        <form id="searchForm">
+            <label for="applSearch">Enter your application number</label>
+            <input type="search" id="applSearch" name="applSearch">
+            <button>Search</button>
+        </form>
+    </section>
     <pre></pre>
     
 </body>

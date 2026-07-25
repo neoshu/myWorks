@@ -2,19 +2,17 @@ const express = require("express");
 const XLSX = require('xlsx');
 const Database = require("better-sqlite3");
 const multer = require("multer");
+import { createTable } from './table.js';
 
 const app = express();
 const path = require("path");
-
 app.use(express.static(path.join(__dirname, "public")));
 
 const db = new Database("motor.db");
 const upload = multer({ storage: multer.memoryStorage() });
 
 // helper function
-// 2012-4-19 -> 2012-04-19
-// 2026-11-7 -> 2026-11-07
-// 2025-06-26 -> unchanged
+// 2012-4-19 -> 2012-04-19   2026-11-7 -> 2026-11-07   2025-06-26 -> unchanged
 function zeroPadding(arg) {
     // arg should be string
     if (typeof arg !== "string") {return false;}
@@ -28,7 +26,6 @@ function zeroPadding(arg) {
         }
     })
     return tmp.join("-");
-
 }
 
 app.post("/import", upload.single("file"), (req, res) => {
@@ -43,7 +40,13 @@ app.post("/import", upload.single("file"), (req, res) => {
         });
     }
 
-    db.prepare(`INSERT INTO correlation (appl) VALUES (?)`).run(`${req.body.applNum}`);
+    if (!req.body.applNum) {
+        return res.status(400).json({
+            ok: false,
+            error: "Missing applicaiton number."
+        });
+    }
+    db.prepare(`INSERT INTO correlation (appl) VALUES (?)`).run(req.body.applNum);
 
     const workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -56,11 +59,14 @@ app.post("/import", upload.single("file"), (req, res) => {
         });
     }
 
-    const header = Object.keys(rows[0]); // column header
+    //! const header = Object.keys(rows[0]); // column header
     // for (let row of rows) {
     //     db.prepare(`INSERT INTO material (${header.join(", ")}) 
     //         VALUES (${header.map(c => "?").join(", ")})`).run(Object.values(row));
     // }
+
+    // material table header
+    const header = db.prepare(`PRAGMA table_info(material)`).all().map(c => c.name).slice(1);
 
     const insertRow = db.prepare(
         `INSERT INTO material (${header.join(", ")}) 
@@ -74,19 +80,15 @@ app.post("/import", upload.single("file"), (req, res) => {
             let theArray = Object.values(item);
             let issueDate = zeroPadding(theArray.pop());
             theArray.push(issueDate);
+            theArray.unshift(req.body.applNum);
             insertRow.run(theArray);
         }
     });
 
     inertMany(rows);
 
-
-
-
     res.json({ok: true});
 });
-
-
 
 
 app.listen(3000, () => console.log('http://localhost:3000'));

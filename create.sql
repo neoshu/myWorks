@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS correlation (
 
 CREATE TABLE IF NOT EXISTS material (
     id INTEGER PRIMARY KEY,
-    -- appl TEXT NOT NULL,
+    appl TEXT NOT NULL,
     part TEXT,
     manufacturer TEXT,
     name TEXT,
