@@ -2,7 +2,7 @@ const express = require("express");
 const XLSX = require('xlsx');
 const Database = require("better-sqlite3");
 const multer = require("multer");
-import { createTable } from './table.js';
+
 
 const app = express();
 const path = require("path");
@@ -90,5 +90,34 @@ app.post("/import", upload.single("file"), (req, res) => {
     res.json({ok: true});
 });
 
+
+// app.get
+// app.get("/search", (req, res) => {
+//     const searchCon = req.body.applSearch;
+//     let searchResult = db.prepare(`SELECT * FROM material WHERE appl = ?`).all(searchCon);
+//     if (searchResult.length === 0) {
+//         return res.status(400).json({
+//             ok: false,
+//             error: `No ${searchCon} matched.`
+//         });
+//     } else {
+//         res.json(searchResult);
+//     }
+
+// })
+
+app.post("/search", upload.none(), (req, res) => {
+    const searchCon = req.body.applSearch;
+    let searchResult = db.prepare(`SELECT * FROM material WHERE appl = ?`).all(searchCon);
+    if (searchResult.length === 0) {
+        return res.status(400).json({
+            ok: false,
+            error: `No ${searchCon} matched.`
+        });
+    } else {
+        res.json(searchResult);
+    }
+
+})
 
 app.listen(3000, () => console.log('http://localhost:3000'));

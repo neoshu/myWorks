@@ -3,6 +3,8 @@ const inputFile = document.querySelector("#file");
 const inputForm = document.querySelector("#inputForm");
 const searchForm = document.querySelector("#searchForm");
 const applNumSearch = document.querySelector("#applSearch");
+const preArea = document.querySelector("pre");
+import {createTable} from "./table.js";
 
 // file and text input(POST) eventlistener
 inputForm.addEventListener("submit", async (event) => {
@@ -69,7 +71,7 @@ searchForm.addEventListener("submit", async (event) => {
         }
 
         const applResult = await res.json(); // the result of application search
-        
+        createTable(applResult, "pre");
 
         searchForm.reset();
     } catch (error) {
