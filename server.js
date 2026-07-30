@@ -87,7 +87,7 @@ app.post("/import", upload.single("file"), (req, res) => {
 
     inertMany(rows);
 
-    res.json({ok: true});
+    res.json({ ok: true });
 });
 
 
@@ -119,5 +119,34 @@ app.post("/search", upload.none(), (req, res) => {
     }
 
 })
+
+app.get("/result", (req, res) => {
+    const applNum = req.query.application;
+
+    const rows = db.prepare(`SELECT * FROM material WHERE appl = ?`).all(applNum);
+
+    if (rows.length === 0) {
+        return res.status(404).send(`<h2>No rows found for ${applNum}</h2>`);
+    }
+
+    const headers = Object.keys(rows[0]);
+    const headHtml = headers.map(h => `<th>${h}</th>`).join("");
+    const bodyHtml = rows
+        .map(row => `<tr>${headers.map(h => `<td>${row[h] ?? ""}</td>`).join("")}</tr>`)
+        .join("");
+
+    res.send(`<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Result ${applNum}</title></head>
+<body>
+    <h2>Application ${applNum}</h2>
+    <table>
+        <thead><tr>${headHtml}</tr></thead>
+        <tbody>${bodyHtml}</tbody>
+    </table>
+</body>
+</html>`);
+});
+
 
 app.listen(3000, () => console.log('http://localhost:3000'));
