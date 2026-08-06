@@ -1,10 +1,12 @@
-const inputAppl = document.querySelector("#appl");
-const inputFile = document.querySelector("#file");
+const inputAppl = document.querySelector("#appl");// input applicaiton number
+const inputFile = document.querySelector("#file");// input excel file
 const inputForm = document.querySelector("#inputForm");
-const searchForm = document.querySelector("#searchForm");
+const applicationForm = document.querySelector("#applicationForm");
 const applNumSearch = document.querySelector("#applSearch");
 const preArea = document.querySelector("pre");
-import {createTable} from "./table.js";
+const certificateForm = document.querySelector("#certificateForm");
+const certfSearch = document.querySelector("#certfSearch");
+// import {createTable} from "./table.js";
 
 // file and text input(POST) eventlistener
 inputForm.addEventListener("submit", async (event) => {
@@ -47,7 +49,7 @@ inputForm.addEventListener("submit", async (event) => {
 });
 
 // application number search(GET) eventlistener
-searchForm.addEventListener("submit", async (event) => {
+applicationForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     const search_num = applNumSearch.value.trim();
@@ -67,13 +69,27 @@ searchForm.addEventListener("submit", async (event) => {
 
         if (!res.ok) {
             const data = await res.json().catch(() => ({}));
+            preArea.replaceChildren();
+            
             throw new Error(data.error || `Search failed (${res.status}).`);
+
         }
 
-        const applResult = await res.json(); // the result of application search
-        createTable(applResult, "pre");
+        // const applResult = await res.json(); // the result of application search
+        // createTable(applResult, "pre");
 
-        searchForm.reset();
+        if (preArea.hasChildNodes()) {
+            preArea.replaceChildren();
+        }
+
+        let tag_a = document.createElement("a");
+        
+        tag_a.href= `/result?application=${search_num}`;
+        tag_a.target = "_blank";
+        tag_a.textContent = `Open link for ${search_num}`;
+        preArea.appendChild(tag_a);
+        
+        applicationForm.reset();
     } catch (error) {
         alert(error.message || "Unable to search the application.");
     }

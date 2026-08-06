@@ -17,8 +17,13 @@
             </div>
     
             <div>
-                <label for="appl">Application:</label>
-                <input type="text" id="appl" name="appl" required>
+                <label for="appl">Application number:</label>
+                <input type="text" id="appl" name="appl" required placeholder="necessary">
+            </div>
+
+            <div>
+                <label for="certf">Certificate number:</label>
+                <input type="text" id="certf" name="certf" placeholder="optional">
             </div>
     
             <button type="submit">Submit</button>
@@ -27,18 +32,29 @@
 
     <section>
         <h3>Search section</h3>
-        <form id="searchForm">
-            <label for="applSearch">Enter your application number</label>
-            <input type="search" id="applSearch" name="applSearch">
-            <button>Search</button>
+        <form id="applicationForm">
+            <div>
+                <label for="applSearch">Enter your application number</label>
+                <input type="search" id="applSearch" name="applSearch">
+                <button>Appl Search</button>
+            </div>
+        </form>
+
+        <form id="certificateForm">
+            <div>
+                <label for="certfSearch">Enter your certificate number</label>
+                <input type="search" id="certfSearch" name="certfSearch">
+                <button>Certf Search</button>
+            </div>
         </form>
     </section>
 
-    <a href="/result?application=A2025CCC0717-4897575" target="_blank">Open result</a>
+    <!-- <a href="/result?application=A2025CCC0717-4897575" target="_blank">Open result</a>
     <br>
-    <a href="/result?application=A2025CCC0717-1233456" target="_blank">Open result</a>
+    <a href="/result?application=A2025CCC0717-1233456" target="_blank">Open result</a> -->
 
-    <pre></pre>
+    <!-- When there is a search result, show the link(s) in <pre> -->
+    <pre></pre> 
     
 </body>
 </html>
