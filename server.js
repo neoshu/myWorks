@@ -28,9 +28,10 @@ function zeroPadding(arg) {
     return tmp.join("-");
 }
 
+//* app.post import from input.js
 app.post("/import", upload.single("file"), (req, res) => {
     // req.file      → the uploaded Excel file
-    // req.body      → { applNum: "A1234CCC5678-1234567" }
+    // req.body      → { applNum: "A1234CCC5678-1234567", certfNum: ... }
     // 1. req.body, insert into table correlation
     // 2. read rows from req.file, insert into table material
     if (!req.file) {
@@ -46,7 +47,8 @@ app.post("/import", upload.single("file"), (req, res) => {
             error: "Missing applicaiton number."
         });
     }
-    db.prepare(`INSERT INTO correlation (appl) VALUES (?)`).run(req.body.applNum);
+    db.prepare(`INSERT INTO correlation (appl, certi) VALUES (?, ?)`)
+        .run(req.body.applNum, req.body.certfNum || null);
 
     const workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -90,22 +92,6 @@ app.post("/import", upload.single("file"), (req, res) => {
     res.json({ ok: true });
 });
 
-
-// app.get
-// app.get("/search", (req, res) => {
-//     const searchCon = req.body.applSearch;
-//     let searchResult = db.prepare(`SELECT * FROM material WHERE appl = ?`).all(searchCon);
-//     if (searchResult.length === 0) {
-//         return res.status(400).json({
-//             ok: false,
-//             error: `No ${searchCon} matched.`
-//         });
-//     } else {
-//         res.json(searchResult);
-//     }
-
-// })
-
 app.post("/search", upload.none(), (req, res) => {
     const searchCon = req.body.applSearch;
     let searchResult = db.prepare(`SELECT * FROM material WHERE appl = ?`).all(searchCon);
@@ -136,16 +122,16 @@ app.get("/result", (req, res) => {
         .join("");
 
     res.send(`<!DOCTYPE html>
-<html lang="en">
-<head><meta charset="UTF-8"><title>Result ${applNum}</title></head>
-<body>
-    <h2>Application ${applNum}</h2>
-    <table>
-        <thead><tr>${headHtml}</tr></thead>
-        <tbody>${bodyHtml}</tbody>
-    </table>
-</body>
-</html>`);
+                <html lang="en">
+                <head><meta charset="UTF-8"><title>Result ${applNum}</title></head>
+                <body>
+                <h2>Application ${applNum}</h2>
+                <table>
+                    <thead><tr>${headHtml}</tr></thead>
+                    <tbody>${bodyHtml}</tbody>
+                </table>
+                </body>
+            </html>`);
 });
 
 

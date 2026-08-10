@@ -6,6 +6,9 @@ const applNumSearch = document.querySelector("#applSearch");
 const preArea = document.querySelector("pre");
 const certificateForm = document.querySelector("#certificateForm");
 const certfSearch = document.querySelector("#certfSearch");
+const certfRef = document.querySelector("#certf");
+const records = document.querySelector("#records");
+
 // import {createTable} from "./table.js";
 
 // file and text input(POST) eventlistener
@@ -13,6 +16,8 @@ inputForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     const applNum = inputAppl.value.trim();
+    const certfNum = certfRef.value.trim();// === "" ? null : certfRef.value.trim();
+    
 
     // RegExp to check the pattern of a CCC application.
     const pattern = /^[AV]\d{4}CCC\d{4}-\d{7}$/;
@@ -30,7 +35,9 @@ inputForm.addEventListener("submit", async (event) => {
     const uploadData = new FormData();
     uploadData.append("file", file);
     uploadData.append("applNum", applNum);
-
+    if (certfNum) {uploadData.append("certfNum", certfNum);}
+    
+    
     try {
         const res = await fetch("/import", {
             method: "POST",
@@ -42,13 +49,15 @@ inputForm.addEventListener("submit", async (event) => {
             throw new Error(data.error || `Upload failed (${res.status}).`);
         }
 
+        
+
         inputForm.reset();
     } catch (error) {
         alert(error.message || "Unable to upload the Excel file.");
     }
 });
 
-// application number search(GET) eventlistener
+// application number search eventlistener
 applicationForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
