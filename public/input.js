@@ -10,6 +10,7 @@ const certfRef = document.querySelector("#certf");
 const records = document.querySelector("#records");
 
 // import {createTable} from "./table.js";
+import { pagination } from "./helper/pagi.js";
 
 // file and text input(POST) eventlistener
 inputForm.addEventListener("submit", async (event) => {
@@ -20,7 +21,7 @@ inputForm.addEventListener("submit", async (event) => {
     
 
     // RegExp to check the pattern of a CCC application.
-    const pattern = /^[AV]\d{4}CCC\d{4}-\d{7}$/;
+    const pattern = /^[AV]\d{4}CCC\d{4}-\d{7}$/; //! this will be modified by CQM form
     if (!pattern.test(applNum)) {
         alert("CCC application number is invalid.");
         return;
@@ -49,7 +50,9 @@ inputForm.addEventListener("submit", async (event) => {
             throw new Error(data.error || `Upload failed (${res.status}).`);
         }
 
-        
+        let applications = await res.json();
+        let appls_array = applications.appls;
+        records.textContent = appls_array;
 
         inputForm.reset();
     } catch (error) {
@@ -104,3 +107,5 @@ applicationForm.addEventListener("submit", async (event) => {
     }
 
 })
+
+pagination(document.querySelector("body"), 53, 10, 4);

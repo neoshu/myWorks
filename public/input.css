@@ -1,0 +1,13 @@
+body {
+    background-color: rgb(239, 236, 229);
+}
+
+
+ul {
+    list-style-type: none;
+    display: flex;
+    gap: 40px;
+    background-color: white;
+}
+
+

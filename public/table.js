@@ -32,7 +32,7 @@ export function createTable (data, location) {
             td.textContent = content;
             tr.append(td);
         }
-        tbody.append(tr);
+        // tbody.append(tr);
     }
 
     table.append(tbody);

@@ -4,7 +4,8 @@ DROP TABLE IF EXISTS correlation;
 DROP TABLE IF EXISTS material;
 
 CREATE TABLE IF NOT EXISTS correlation (
-    appl TEXT PRIMARY KEY,
+    id INTEGER PRIMARY KEY,
+    appl TEXT,
     certi TEXT,
     former TEXT
 );
@@ -24,7 +25,8 @@ CREATE TABLE IF NOT EXISTS material (
     -- FOREIGN KEY (appl) REFERENCES correlation (appl)
 );
 
-CREATE TABLE IF NOT EXISTS appl_certi (
-    appl TEXT PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS appl_report (
+    id INTEGER PRIMARY KEY,
+    appl TEXT,
     report TEXT
 );

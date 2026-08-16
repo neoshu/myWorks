@@ -75,7 +75,7 @@ app.post("/import", upload.single("file"), (req, res) => {
             VALUES (${header.map(c => "?").join(", ")})`
     );
 
-    const inertMany = db.transaction((items) => {
+    const insertMany = db.transaction((items) => {
         for (let item of items) {
             // the last element(issue) of item should be something like 2026-02-07
             // instead of 2026-2-7
@@ -87,9 +87,13 @@ app.post("/import", upload.single("file"), (req, res) => {
         }
     });
 
-    inertMany(rows);
+    insertMany(rows);
 
-    res.json({ ok: true });
+    // retrieve applicaiton numbers from db
+    const db_appls = db.prepare(`SELECT DISTINCT (appl)
+                                FROM (material)`).all();
+
+    res.json({ ok: true, appls: db_appls });
 });
 
 app.post("/search", upload.none(), (req, res) => {
