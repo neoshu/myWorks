@@ -10,4 +10,12 @@ ul {
     background-color: white;
 }
 
+table {
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 8px 24px;
+    text-align: left;
+}
 

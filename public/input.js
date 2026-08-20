@@ -1,24 +1,30 @@
-const inputAppl = document.querySelector("#appl");// input applicaiton number
-const inputFile = document.querySelector("#file");// input excel file
 const inputForm = document.querySelector("#inputForm");
-const applicationForm = document.querySelector("#applicationForm");
+const inputFile = document.querySelector("#file");// input excel file
+const inputAppl = document.querySelector("#inpt_appl");// input applicaiton number
+const inputCertf = document.querySelector("#input_certf"); // input certificate
+const inputReport = document.querySelector("#input_repot"); // input report number
+
+const applicationForm = document.querySelector("#applSearchForm");
 const applNumSearch = document.querySelector("#applSearch");
-const preArea = document.querySelector("pre");
-const certificateForm = document.querySelector("#certificateForm");
+
+const certificateForm = document.querySelector("#certfSearchForm");
 const certfSearch = document.querySelector("#certfSearch");
-const certfRef = document.querySelector("#certf");
+
+const preArea = document.querySelector("pre");
 const records = document.querySelector("#records");
 
-// import {createTable} from "./table.js";
-import { pagination } from "./helper/pagi.js";
+import {createTable} from "./table.js";
+// import { pagination } from "./helper/pagi.js";
+
+
 
 // file and text input(POST) eventlistener
 inputForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     const applNum = inputAppl.value.trim();
-    const certfNum = certfRef.value.trim();// === "" ? null : certfRef.value.trim();
-    
+    const certfNum = inputCertf.value.trim();// === "" ? null : certfRef.value.trim();
+    const reportNum = inputReport.value.trim();
 
     // RegExp to check the pattern of a CCC application.
     const pattern = /^[AV]\d{4}CCC\d{4}-\d{7}$/; //! this will be modified by CQM form
@@ -36,6 +42,7 @@ inputForm.addEventListener("submit", async (event) => {
     const uploadData = new FormData();
     uploadData.append("file", file);
     uploadData.append("applNum", applNum);
+    uploadData.append("reportNum", reportNum);
     if (certfNum) {uploadData.append("certfNum", certfNum);}
     
     
@@ -50,15 +57,26 @@ inputForm.addEventListener("submit", async (event) => {
             throw new Error(data.error || `Upload failed (${res.status}).`);
         }
 
-        let applications = await res.json();
-        let appls_array = applications.appls;
-        records.textContent = appls_array;
+        
+
+        // if (records.hasChildNodes()) {records.replaceChildren();}
+        // createTable(wanted_array, records);
 
         inputForm.reset();
     } catch (error) {
         alert(error.message || "Unable to upload the Excel file.");
     }
 });
+
+//TODO add asyn function here
+// async function loadData() {
+//     // when the web is loaded, db data shows in table
+//     const data_res = await fetch("/api/load");
+//     const data = await data_res.json()
+//     if (records.hasChildNodes()) {records.replaceChildren();}
+//     createTable(data.applReport, records);
+// }
+// loadData();
 
 // application number search eventlistener
 applicationForm.addEventListener("submit", async (event) => {
@@ -108,4 +126,4 @@ applicationForm.addEventListener("submit", async (event) => {
 
 })
 
-pagination(document.querySelector("body"), 53, 10, 4);
+// pagination(document.querySelector("body"), 53, 10, 4);

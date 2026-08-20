@@ -9,7 +9,8 @@ export function createTable (data, location) {
     // assume data is an array of plain objects
     // assume location is element string, like "body"
     // create a table under element location
-    
+    // location is a tag node
+
     // table header row
     const rowHeader = Object.keys(data[0]); 
     const table = document.createElement("table");
@@ -36,7 +37,8 @@ export function createTable (data, location) {
     }
 
     table.append(tbody);
-    document.querySelector(location).textContent = ""; // very important
-    document.querySelector(location).append(table);
+    // document.querySelector(location).textContent = ""; // very important
+    // document.querySelector(location).append(table);
+    location.append(table);
 
 }

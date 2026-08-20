@@ -3,7 +3,6 @@ const XLSX = require('xlsx');
 const Database = require("better-sqlite3");
 const multer = require("multer");
 
-
 const app = express();
 const path = require("path");
 app.use(express.static(path.join(__dirname, "public")));
@@ -31,9 +30,8 @@ function zeroPadding(arg) {
 //* app.post import from input.js
 app.post("/import", upload.single("file"), (req, res) => {
     // req.file      → the uploaded Excel file
-    // req.body      → { applNum: "A1234CCC5678-1234567", certfNum: ... }
-    // 1. req.body, insert into table correlation
-    // 2. read rows from req.file, insert into table material
+    // req.body      → { applNum: "A1234CCC5678-1234567", certfNum: ..., reportNum:...}
+    
     if (!req.file) {
         return res.status(400).json({
             ok: false,
@@ -47,9 +45,24 @@ app.post("/import", upload.single("file"), (req, res) => {
             error: "Missing applicaiton number."
         });
     }
+
+    if (!req.body.reportNum) {
+        return res.status(400).json({
+            ok: false,
+            error: "Missing report number."
+        });
+    }
+
+    // INSERT req.body.applNum and req.body.certfNum INTO table correlation
     db.prepare(`INSERT INTO correlation (appl, certi) VALUES (?, ?)`)
         .run(req.body.applNum, req.body.certfNum || null);
 
+    
+    // INSERT req.body.applNum and req.body.reportNum INTO table appl_report
+    db.prepare(`INSERT INTO appl_report (appl, report)
+        VALUES (?, ?)`).run(req.body.applNum, req.body.reportNum);
+
+    // process file
     const workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     const rows = XLSX.utils.sheet_to_json(sheet, { defval: null }); // array
@@ -61,13 +74,6 @@ app.post("/import", upload.single("file"), (req, res) => {
         });
     }
 
-    //! const header = Object.keys(rows[0]); // column header
-    // for (let row of rows) {
-    //     db.prepare(`INSERT INTO material (${header.join(", ")}) 
-    //         VALUES (${header.map(c => "?").join(", ")})`).run(Object.values(row));
-    // }
-
-    // material table header
     const header = db.prepare(`PRAGMA table_info(material)`).all().map(c => c.name).slice(1);
 
     const insertRow = db.prepare(
@@ -89,12 +95,24 @@ app.post("/import", upload.single("file"), (req, res) => {
 
     insertMany(rows);
 
-    // retrieve applicaiton numbers from db
-    const db_appls = db.prepare(`SELECT DISTINCT (appl)
-                                FROM (material)`).all();
+    
+    // const applANDreport = db.prepare(`SELECT * FROM appl_report`).all();
+    
 
-    res.json({ ok: true, appls: db_appls });
+    // res.json({ ok: true, applReport: applANDreport });
 });
+
+//! app.get
+// app.get("/api/load", (req, res) => {
+//     const applANDreport = db.prepare(`SELECT appl, report, created_at
+//         FROM appl_report
+//         ORDER BY created_at DESC`).all();
+    
+//     const numbered = applANDreport.map((c, i) => ({ id: i + 1, ...c }));
+
+//     res.json({ ok: true, applReport: numbered });
+// });
+
 
 app.post("/search", upload.none(), (req, res) => {
     const searchCon = req.body.applSearch;
@@ -108,7 +126,7 @@ app.post("/search", upload.none(), (req, res) => {
         res.json(searchResult);
     }
 
-})
+});
 
 app.get("/result", (req, res) => {
     const applNum = req.query.application;

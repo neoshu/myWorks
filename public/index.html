@@ -28,13 +28,18 @@
             </div>
     
             <div>
-                <label for="appl">Application number:</label>
-                <input type="text" id="appl" name="appl" required placeholder="necessary">
+                <label for="inpt_appl">Application number:</label>
+                <input type="text" id="inpt_appl" name="inpt_appl" required placeholder="necessary">
             </div>
 
             <div>
-                <label for="certf">Certificate number:</label>
-                <input type="text" id="certf" name="certf" placeholder="optional">
+                <label for="input_repot">Report number:</label>
+                <input type="text" id="input_repot" name="input_repot" required placeholder="necessary">
+            </div>
+
+            <div>
+                <label for="input_certf">Certificate number (optional):</label>
+                <input type="text" id="input_certf" name="input_certf">
             </div>
     
             <button type="submit">Submit</button>
@@ -48,7 +53,7 @@
 
     <section>
         <h3>Search section</h3>
-        <form id="applicationForm">
+        <form id="applSearchForm">
             <div>
                 <label for="applSearch">Enter your application number</label>
                 <input type="search" id="applSearch" name="applSearch">
@@ -56,7 +61,7 @@
             </div>
         </form>
 
-        <form id="certificateForm">
+        <form id="certfSearchForm">
             <div>
                 <label for="certfSearch">Enter your certificate number</label>
                 <input type="search" id="certfSearch" name="certfSearch">
@@ -72,6 +77,11 @@
     <!-- When there is a search result, show the link(s) in <pre> -->
     <pre></pre>
     <div id="records"></div> 
+    <div id="container">
+        <span id="pagination">
+            
+        </span>
+    </div>
     
 </body>
 </html>
