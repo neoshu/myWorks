@@ -95,14 +95,25 @@ app.post("/import", upload.single("file"), (req, res) => {
 
     insertMany(rows);
 
-    
-    // const applANDreport = db.prepare(`SELECT * FROM appl_report`).all();
-    
+    /*
+    server => frontend
+    totalRecords: the amount of all the records from table appl_report
+    pageSize: the amount of records shown on a page, set up manually
+    pageItems: you cannot show 100 pagination items on a page, so this specify
+                how many pagination items shown on a page
+    */
+    let {count: totalRecords} = db.prepare(`SELECT COUNT(*) AS count FROM appl_report`).get();
+    const pageSize = 10;
+    const pageItems = 4;
+    let totalPagiItems = Math.ceil(totalRecords / pageSize);
 
-    // res.json({ ok: true, applReport: applANDreport });
+    res.json({ok: true, totalRecords, pageSize, pageItems, totalPagiItems});
+
+
+
 });
 
-//! app.get
+
 // app.get("/api/load", (req, res) => {
 //     const applANDreport = db.prepare(`SELECT appl, report, created_at
 //         FROM appl_report

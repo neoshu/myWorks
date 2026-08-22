@@ -57,10 +57,6 @@ inputForm.addEventListener("submit", async (event) => {
             throw new Error(data.error || `Upload failed (${res.status}).`);
         }
 
-        
-
-        // if (records.hasChildNodes()) {records.replaceChildren();}
-        // createTable(wanted_array, records);
 
         inputForm.reset();
     } catch (error) {
