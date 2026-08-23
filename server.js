@@ -5,6 +5,7 @@ const multer = require("multer");
 
 const app = express();
 const path = require("path");
+const { off } = require("cluster");
 app.use(express.static(path.join(__dirname, "public")));
 
 const db = new Database("motor.db");
@@ -166,6 +167,16 @@ app.get("/result", (req, res) => {
                 </body>
             </html>`);
 });
+
+app.get("/api/post", (req, res) => {
+    const page = req.query.page;
+    const pageSize = 3;
+    const offset = (page - 1) * pageSize;
+    const rows = db.prepare(`SELECT * FROM appl_report LIMIT ? OFFSET ?`).all(pageSize, offset);
+
+    res.json(rows);
+});
+
 
 
 app.listen(3000, () => console.log('http://localhost:3000'));

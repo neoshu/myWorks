@@ -13,8 +13,24 @@ const certfSearch = document.querySelector("#certfSearch");
 const preArea = document.querySelector("pre");
 const records = document.querySelector("#records");
 
+const container = document.querySelector("#container");
+
+
 import {createTable} from "./table.js";
 // import { pagination } from "./helper/pagi.js";
+
+let tag_1 = document.createElement("a");
+tag_1.textContent = "the second 3 records";
+tag_1.href = `/?page=2`;
+container.appendChild(tag_1);
+const params = new URLSearchParams(window.location.search);
+const page = Number(params.get("page")) ; // Number(null) --> 0
+if (page) {
+    let mytest = await fetch(`/api/post?page=${page}`);
+    let rows = await mytest.json();
+    createTable(rows, records);
+
+}
 
 
 
