@@ -96,22 +96,7 @@ app.post("/import", upload.single("file"), (req, res) => {
 
     insertMany(rows);
 
-    /*
-    server => frontend
-    totalRecords: the amount of all the records from table appl_report
-    pageSize: the amount of records shown on a page, set up manually
-    pageItems: you cannot show 100 pagination items on a page, so this specify
-                how many pagination items shown on a page
-    */
-    let {count: totalRecords} = db.prepare(`SELECT COUNT(*) AS count FROM appl_report`).get();
-    const pageSize = 10;
-    const pageItems = 4;
-    let totalPagiItems = Math.ceil(totalRecords / pageSize);
-
-    res.json({ok: true, totalRecords, pageSize, pageItems, totalPagiItems});
-
-
-
+    
 });
 
 
@@ -168,13 +153,20 @@ app.get("/result", (req, res) => {
             </html>`);
 });
 
-app.get("/api/post", (req, res) => {
-    const page = req.query.page;
-    const pageSize = 3;
-    const offset = (page - 1) * pageSize;
-    const rows = db.prepare(`SELECT * FROM appl_report LIMIT ? OFFSET ?`).all(pageSize, offset);
 
-    res.json(rows);
+app.get("/dbCount", (req, res) => {
+    const {count} = db.prepare(`SELECT COUNT(*) AS count FROM appl_report`)
+        .get();
+    
+    res.json(count);    
+});
+
+// `/api/records?page=${i}`
+app.get("/api/records", (req, res) => {
+    let offset = req.query.page - 1;
+    let data = db.prepare(`SELECT * FROM appl_report LIMIT 6 OFFSET ?`).all(offset);
+    res.json(data);
+
 });
 
 

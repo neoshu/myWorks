@@ -19,3 +19,8 @@ th, td {
     text-align: left;
 }
 
+a {
+    padding: 8px 24px;
+    text-decoration: none;
+    border: solid blue 1px;
+}

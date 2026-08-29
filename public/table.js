@@ -39,6 +39,10 @@ export function createTable (data, location) {
     table.append(tbody);
     // document.querySelector(location).textContent = ""; // very important
     // document.querySelector(location).append(table);
+    if (location.hasChildNodes()) {
+            location.replaceChildren();
+        }
+
     location.append(table);
 
 }

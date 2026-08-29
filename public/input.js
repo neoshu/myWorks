@@ -18,20 +18,72 @@ const container = document.querySelector("#container");
 
 import {createTable} from "./table.js";
 // import { pagination } from "./helper/pagi.js";
+// import {createPagi} from "./helper/createPagi.js";
+import {createSpan} from "./helper/createPagi.js";
 
-let tag_1 = document.createElement("a");
-tag_1.textContent = "the second 3 records";
-tag_1.href = `/?page=2`;
-container.appendChild(tag_1);
-const params = new URLSearchParams(window.location.search);
-const page = Number(params.get("page")) ; // Number(null) --> 0
-if (page) {
-    let mytest = await fetch(`/api/post?page=${page}`);
-    let rows = await mytest.json();
-    createTable(rows, records);
+// inital to GET the count(*) from db
+let initiaCount = await fetch("/dbCount");
+let count = Number(await initiaCount.json());
+console.log(count);
 
-}
 
+// let tag_1 = document.createElement("a");
+// tag_1.textContent = "the second 3 records";
+// tag_1.href = `/?page=2`;
+// container.appendChild(tag_1);
+// const params = new URLSearchParams(window.location.search);
+// const page = Number(params.get("page")) ; // Number(null) --> 0
+// if (page) {
+//     let mytest = await fetch(`/api/post?page=${page}`);
+//     let rows = await mytest.json();
+//     createTable(rows, records);
+
+// }
+let current = 1;
+let click = 1;
+let pageSize = 6; //! doubt if it is unnecessary
+let pageItems = 4; //! doubt if it is unnecessary
+
+let previous = document.createElement("a");
+previous.textContent = "<";
+previous.setAttribute("id", "pre");
+
+let next = document.createElement("a");
+next.textContent = ">";
+next.setAttribute("id", "next");
+
+// the initial web records from db
+let params = new URLSearchParams(window.location.search);
+let initialPage = params.get("page") ?? 1;
+let initial = await fetch(`/api/records?page=${initialPage}`);
+let rows = await initial.json();
+createTable(rows, records);
+
+
+// onward, 53 is just an example for totalRecords
+let oldPagiSpan = createSpan(count, 6, 4, current);
+container.append(previous, oldPagiSpan, next);
+
+next.addEventListener("click", (event) => {
+    event.preventDefault();
+    let allowedClick = 1 + Math.ceil(count / 6) - 4;
+    if (click >= allowedClick) {return;} // 6 = 1 + Math.ceil(totalRecords / pageSize) - 4
+    current += 1;
+    let newPagiSpan = createSpan(count, 6, 4, current);
+    container.replaceChild(newPagiSpan, oldPagiSpan);
+    oldPagiSpan = newPagiSpan;
+    click += 1;
+});
+
+previous.addEventListener("click", (event) => {
+    event.preventDefault();
+    if (click <= 1) {return;}
+    current -= 1;
+    let newPagiSpan = createSpan(count, 6, 4, current);
+    container.replaceChild(newPagiSpan, oldPagiSpan);
+    oldPagiSpan = newPagiSpan;
+    click -= 1;
+});
 
 
 // file and text input(POST) eventlistener
@@ -75,6 +127,7 @@ inputForm.addEventListener("submit", async (event) => {
 
 
         inputForm.reset();
+        window.location.reload();
     } catch (error) {
         alert(error.message || "Unable to upload the Excel file.");
     }
